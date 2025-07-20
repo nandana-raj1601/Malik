@@ -76,13 +76,3 @@ Built with ❤️ by [Nandana Raj](https://github.com/nandana-raj1601)
 📬 Reach out for suggestions, feedback, or collaboration!
 
 ```
-
----
-
-Let me know when it’s up on GitHub — we can also:
-- Add badges (e.g., `flutter`, `MIT license`, `open to contributions`)
-- Design a banner or logo
-- Set up GitHub Projects to track progress visually
-
-Want help with any of those?
-```
