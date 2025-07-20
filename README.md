@@ -75,4 +75,3 @@ Malik was created to simplify and structure the process of applying abroad for I
 Built with ❤️ by [Nandana Raj](https://github.com/nandana-raj1601)
 📬 Reach out for suggestions, feedback, or collaboration!
 
-```
