@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'library_screen.dart';
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+import '../models/college.dart';
+import 'profile_screen.dart';
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-class _HomeScreenState extends State<HomeScreen> {
-  final List<String> savedColleges = [];
+class HomeScreen extends StatelessWidget {
+  final List<College> colleges;
+  final Function(College) onToggleInterest;
+
+  const HomeScreen({
+    super.key,
+    required this.colleges,
+    required this.onToggleInterest,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +22,15 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.notifications),
             onPressed: () {},
           ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+            Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+        },
+    ),
         ],
       ),
       body: Padding(
@@ -25,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search bar
             TextField(
               decoration: InputDecoration(
                 hintText: 'Search colleges, countries, scholarships...',
@@ -36,18 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Recommended Section Title
             const Text(
               'Recommended Colleges & Courses',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
-            // Grid of Cards (2 per row)
             Expanded(
               child: GridView.builder(
-                itemCount: 6, // Adjust as needed
+                itemCount: colleges.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
@@ -55,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   childAspectRatio: 0.8,
                 ),
                 itemBuilder: (context, index) {
+                  final college = colleges[index];
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -65,38 +74,38 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'College ${index + 1}',
+                          college.name,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'MSc in Computer Science\nGermany',
-                          style: TextStyle(fontSize: 12),
+                        Text(
+                          '${college.course}\n${college.country}',
+                          style: const TextStyle(fontSize: 12),
                         ),
                         const Spacer(),
                         ElevatedButton.icon(
-                            onPressed: () {
-                        final collegeName = 'College ${index + 1}';
-                        if (!savedColleges.contains(collegeName)) {
-                            setState(() {
-                            savedColleges.add(collegeName);
-                            });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Added $collegeName to Library')),
-                        );
-                        } else {
+                          onPressed: () {
+                            onToggleInterest(college);
                             ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('$collegeName is already in your Library')),
+                              SnackBar(
+                                content: Text(
+                                  college.isInterested
+                                      ? '"${college.name}" added to Library'
+                                      : '"${college.name}" removed from Library',
+                                ),
+                              ),
                             );
-                        }
-                        },
-
-                          icon: const Icon(Icons.add, size: 16),
-                          label: const Text("Interested"),
+                          },
+                          icon: Icon(
+                            college.isInterested ? Icons.check : Icons.add,
+                            size: 16,
+                          ),
+                          label: Text(college.isInterested ? "Added" : "Interested"),
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: college.isInterested ? Colors.green : null,
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                             textStyle: const TextStyle(fontSize: 12),
                           ),
