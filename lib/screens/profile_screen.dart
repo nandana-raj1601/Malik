@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'roadmap_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Provider;
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -85,20 +87,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-  onPressed: () {
+  onPressed: () async {
+    print('Button pressed');
     if (_formKey.currentState!.validate() && _preferredCountries.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved!')),
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RoadmapScreen(
-            degreeYear: _degreeYear!,
-            targetIntake: _targetIntake!,
+      print('Form validated');
+      // Save to Supabase
+      final userProfile = {
+        'degree_year': _degreeYear,
+        'branch': _branch,
+        'target_intake': _targetIntake,
+        'preferred_countries': _preferredCountries.join(','),
+        'user_id': Supabase.instance.client.auth.currentUser?.id,
+      };
+      print('Sending to Supabase: $userProfile');
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .insert([userProfile]);
+      print('Supabase response: ${response.data}, error: ${response.error}');
+      if (response.error == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile saved!')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoadmapScreen(
+              degreeYear: _degreeYear!,
+              targetIntake: _targetIntake!,
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.error!.message}')),
+        );
+      }
     } else if (_preferredCountries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Select at least one country')),
@@ -107,6 +130,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   },
   child: const Text('Save'),
 ),
+ElevatedButton(
+  onPressed: () async {
+    await Supabase.instance.client.auth.signOut();
+    setState(() {}); // This will trigger a rebuild and go back to LoginScreen
+  },
+  child: const Text("Logout"),
+)
+
             ],
           ),
         ),

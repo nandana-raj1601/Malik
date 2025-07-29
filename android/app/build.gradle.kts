@@ -20,6 +20,7 @@ android {
     }
 
     defaultConfig {
+        applicationId "com.nandana.malik"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.malik"
         // You can update the following values to match your application needs.
